@@ -1,0 +1,45 @@
+{% extends "admin-index.html" %}
+{% block content %}
+    {% for post in posts %}
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="post-card shadow mt-3 mb-3 p-3">
+                        <h2>{{ post.get('title') }}</h2>
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex align-items-center m-2">
+                                <p class="author ml-3">{{ post.get('posted_by') }}</p>
+                            </div>
+                            <p class="time align-self-center">{{ post.get('posted_at').strftime("%d %b %Y %I:%M %p") }}</p>
+                        </div>
+                        <p>{{ post.get('content') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock content %}
+
+{% block dashboard %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <form method="post" action="{{ url_for('do_admin_choice') }}">
+                        <div class="form-group d-flex flex-column">
+                            <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createIntern">Create Intern Account</button>
+                            <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createMentor">Create Mentor Account</button>
+                            <button class="btn btn-outline-primary w-100 m-1" name="admin-choice" type="submit" value="updateIntern">Update Intern Account</button>
+                            <!--
+                            <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="tasksByMentor">Display Tasks by Mentor</button>
+                            -->
+                            <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="displayMap">View Mapping</button>
+                            <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="displayTasks">Display Tasks</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock dashboard %}
+
+{% block tasks %}
+{% endblock tasks %}

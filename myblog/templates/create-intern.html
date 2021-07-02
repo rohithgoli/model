@@ -1,0 +1,48 @@
+{% extends "admin-index.html" %}
+{% block content %}
+<h1>Create Intern Account</h1>
+<form id="userDataForm" action="{{url_for('create_intern')}}" method="post">
+    <div class="form-field-container">
+        <label>Intern Username</label>
+        <input type="text" class="form-field" name="username" required/>
+    </div>
+    <div class="form-field-container">
+        <label>Intern Email</label>
+        <input class="form-field" type="email" pattern="[a-z0-9._%+-]+@+(anywhere.co|gmail.com)"
+               title="Only @anywhere.co domain is accepted" name="email" required/>
+    </div>
+    <div class="form-field-container">
+        <label>Intern Password</label>
+        <input class="form-field" type="text" name="password" required/>
+    </div>
+    <div class="form-field-container">
+        <label>Mentor</label>
+        <select class="form-field" name="mentor" required>
+            {% for mentor in mentors %}
+                <option>{{ mentor }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="form-btn">Submit</button>
+</form>
+{% endblock content %}
+
+{% block dashboard %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <form method="post" action="{{ url_for('do_admin_choice') }}">
+                        <div class="form-group d-flex flex-column">
+                            <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createIntern">Create Intern Account</button>
+                            <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createMentor">Create Mentor Account</button>
+                            <!--
+                            <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="tasksByMentor">Display Tasks by Mentor</button>
+                            -->
+                            <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="displayMap">View Mapping</button>
+                            <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="displayTasks">Display Tasks</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock dashboard %}

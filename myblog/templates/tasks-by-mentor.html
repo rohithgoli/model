@@ -1,0 +1,63 @@
+{% extends "mentor-home.html" %}
+{% block content %}
+    <h2>Display Assigned Tasks</h2>
+    <form id="userDataForm" action="{{url_for('display_tasks_by_mentor')}}" method="post">
+        <div class="form-field-container">
+            <label>Select Intern</label>
+            <select class="form-field" name="intern" required>
+                <option>Select Intern</option>
+                {% for intern in interns %}
+                    <option>{{ intern }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="form-btn">Submit</button>
+    </form>
+{% endblock content %}
+
+{% block dashboard %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form method="post" action="{{ url_for('do_mentor_choice') }}">
+                    <div class="form-group d-flex flex-column">
+                        <button class="btn btn-outline-info w-100 m-1" name="mentor-choice" type="submit" value="assignTask">Assign Task</button>
+                        <button class="btn btn-outline-info w-100 m-1" name="mentor-choice" type="submit" value="viewInternPosts">View Intern Posts</button>
+                        <button class="btn btn-outline-secondary w-100 m-1" name="mentor-choice" type="submit" value="tasksByMentor">Display Assigned Tasks</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock dashboard %}
+
+{% block tasks %}
+    {% if request.method == 'POST' %}
+        {% if tasks %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <table border="1">
+                            <thead>
+                                <tr>
+                                    {% for eachCol in colNames %}
+                                        <th class="col-2 text-center">{{ eachCol }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks[1] %}
+                                <tr>
+                                    {% for eachCol in colNames %}
+                                        <td class="col-2 text-center">{{ task[eachCol] }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock tasks %}

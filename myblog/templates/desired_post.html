@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/index.css') }}">
+    {% if title %}
+        <title>My Blog - {{ title }}</title>
+    {% else %}
+        <title>My Blog</title>
+    {% endif %}
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="post-card shadow mt-3 mb-3 p-3">
+                    <h2>{{ post.title }}</h2>
+                    <div class="d-flex flex-row justify-content-between">
+                        <a href="{{ url_for('user_posts', username=post.author.username) }}"><p class="author ml-3">{{ post.author.username }}</p></a>
+                        <p class="time align-self-center">{{ post.date_posted.strftime("%d %b %Y %I:%M %p") }}</p>
+                    </div>
+                    {% if post.author == current_user %}
+                        <div class="d-flex justify-content-end">
+                            <a class="btn btn-info m-1" href="{{ url_for('update_post', post_id=post.id) }}">Edit</a>
+                            <button class="btn btn-warning btn-sm m-1" type="button" data-toggle="modal" data-target="#deleteModal">Delete</button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Delete Post ?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post">
+                                        <input type="submit" class="btn btn-danger" value="Delete">
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <p class="authored-content">{{ post.content }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

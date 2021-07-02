@@ -1,0 +1,36 @@
+{% extends "index.html" %}
+{% block content %}
+    <h1>Posts by {{ user.username }} : {{ posts.total }} </h1>
+    {% for post in posts.items %}
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-8">
+                    <div class="post-card shadow mt-3 mb-3 p-3">
+                        <h2><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a></h2>
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex align-items-center m-2">
+                                <img src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}"
+                                     class="home-account-img"/>
+                                <a href="{{ url_for('user_posts', username=post.author.username, ) }}"><p class="author ml-3">{{ post.author.username }}</p></a>
+                            </div>
+                            <p class="time align-self-center">{{ post.date_posted.strftime("%d %b %Y %I:%M %p") }}</p>
+                        </div>
+                        <p>{{ post.content }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="d-flex flex-row justify-content-center">
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+            {% if posts.page==page_num %}
+                <a class="btn btn-secondary mr-2 mb-5" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-secondary mr-2 mb-5" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+        {% endif %}
+    {% endfor %}
+    </div>
+{% endblock content %}

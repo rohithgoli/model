@@ -1,0 +1,54 @@
+{% extends "mentor-home.html" %}
+{% block content %}
+    {% if request.method == 'GET' %}
+    <h2>View Intern Posts</h2>
+    <form id="userDataForm" action="{{url_for('display_posts_by_intern')}}" method="post">
+        <div class="form-field-container">
+            <label>Select Intern</label>
+            <select class="form-field" name="intern" required>
+                <option>Select Intern</option>
+                {% for intern in interns %}
+                    <option>{{ intern }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="form-btn">Submit</button>
+    </form>
+    {% else %}
+        {% for post in posts %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="post-card shadow mt-3 mb-3 p-3">
+                            <h2>{{ post.get('title') }}</h2>
+                            <div class="d-flex flex-row justify-content-between">
+                                <div class="d-flex align-items-center m-2">
+                                    <p class="author ml-3">{{ post.get('posted_by') }}</p>
+                                </div>
+                                <p class="time align-self-center">{{ post.get('posted_at').strftime("%d %b %Y %I:%M %p") }}</p>
+                            </div>
+                            <p>{{ post.get('content') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}
+
+{% block dashboard %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form method="post" action="{{ url_for('do_mentor_choice') }}">
+                    <div class="form-group d-flex flex-column">
+                        <button class="btn btn-outline-info w-100 m-1" name="mentor-choice" type="submit" value="assignTask">Assign Task</button>
+                        <button class="btn btn-outline-info w-100 m-1" name="mentor-choice" type="submit" value="viewInternPosts">View Intern Posts</button>
+                        <button class="btn btn-outline-secondary w-100 m-1" name="mentor-choice" type="submit" value="tasksByMentor">Display Assigned Tasks</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock dashboard %}
+

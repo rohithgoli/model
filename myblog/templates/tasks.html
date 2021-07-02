@@ -1,0 +1,21 @@
+{% extends "index.html" %}
+{% block content %}
+    {% for task in tasks %}
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <div class="post-card shadow mt-3 mb-3 p-3">
+                        <h2>{{ task.get('title') }}</h2>
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex align-items-center m-2">
+                                <p class="author ml-3">By {{ task.get('assigned_by') }}</p>
+                            </div>
+                            <p class="time align-self-center">on {{ task.get('posted_at').strftime("%d %b %Y %I:%M %p") }}</p>
+                        </div>
+                        <p>{{ task.get('content') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock content %}

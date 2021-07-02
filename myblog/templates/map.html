@@ -1,0 +1,90 @@
+{% extends "admin-home.html" %}
+{% block content %}
+    <h2>Intern Mentor Map</h2>
+    <form id="userDataForm" action="{{url_for('display_map')}}" method="post">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-5 form-field-container">
+                    <label>Select Mode</label>
+                    <select class="form-field" name="mode" required>
+                        <option>Select Mode</option>
+                        <option>Intern</option>
+                        <option>Mentor</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="form-btn mt-3">Submit</button>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block dashboard %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form method="post" action="{{ url_for('do_admin_choice') }}">
+                    <div class="form-group d-flex flex-column">
+                        <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createIntern">Create Intern Account</button>
+                        <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createMentor">Create Mentor Account</button>
+                        <!--
+                        <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="tasksByMentor">Display Tasks by Mentor</button>
+                        -->
+                        <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="displayMap">View Mapping</button>
+                        <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="displayTasks">Display Tasks</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock dashboard %}
+
+{% block tasks %}
+    {% if request.method == 'POST' %}
+        {% if interns or mentors %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <table border="1">
+                            <thead>
+                                <tr>
+                                    {% if mode=="Intern" %}
+                                        <th class="col-2 text-center">{{ mode }}</th>
+                                        <th class="col-2 text-center">Mentor</th>
+                                    {% else %}
+                                        <th class="col-2 text-center">Mentor</th>
+                                        <th class="col-2 text-center">Intern</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if mode == "Intern" %}
+                                    {% for i in range(count) %}
+                                        <tr>
+                                            <td class="col-2 text-center">{{ interns[i] }}</td>
+                                            <td class="col-2 text-center">
+                                                {% for each_mentor in mentors[i] %}
+                                                    <p class="text-center">{{ each_mentor }}</p>
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for i in range(count) %}
+                                        <tr>
+                                            <td class="col-2 text-center">{{ mentors[i] }}</td>
+                                            <td class="col-2 text-center">
+                                                {% for each_intern in interns[i] %}
+                                                    <p class="text-center">{{ each_intern }}</p>
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock tasks %}
