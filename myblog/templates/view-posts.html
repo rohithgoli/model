@@ -20,14 +20,14 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="post-card shadow mt-3 mb-3 p-3">
-                            <h2>{{ post.get('title') }}</h2>
+                            <h2><a href="{{ url_for('post', post_id=post.post_id) }}" target="_blank">{{ post.get('title') }}</a></h2>
                             <div class="d-flex flex-row justify-content-between">
                                 <div class="d-flex align-items-center m-2">
                                     <p class="author ml-3">{{ post.get('posted_by') }}</p>
                                 </div>
                                 <p class="time align-self-center">{{ post.get('posted_at').strftime("%d %b %Y %I:%M %p") }}</p>
                             </div>
-                            <p>{{ post.get('content') }}</p>
+                            <p class="post-content">{{ post.get('content') }}</p>
                         </div>
                     </div>
                 </div>

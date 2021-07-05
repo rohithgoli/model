@@ -12,25 +12,12 @@
 <body>
     <div class="bg-container">
         <div class="card shadow">
-            <h1>Posts by {{ author }} : {{ posts_count }} </h1>
-            {% for post in posts %}
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="post-card shadow mt-3 mb-3 p-3">
-                                <h2><a href="{{ url_for('post', post_id=post.post_id) }}" target="_blank">{{ post.get('title') }}</a></h2>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <div class="d-flex align-items-center m-2">
-                                        <p class="author ml-3">{{ post.get('posted_by') }}</p>
-                                    </div>
-                                    <p class="time align-self-center">{{ post.get('posted_at').strftime("%d %b %Y %I:%M %p") }}</p>
-                                </div>
-                                <p class="post-content">{{ post.get('content') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+            <h1 class="title">{{ item.get('title') }}</h1>
+            <div class="item-details-container">
+                <h4 class="author">{{ item.get('posted_by') }}</h4>
+                <h6 class="time">{{ item.get('posted_at').strftime("%d %b %Y %I:%M %p") }}</h6>
+            </div>
+            <p class="content">{{ item.get('content') }}</p>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

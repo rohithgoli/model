@@ -51,6 +51,12 @@
                                     {% for eachCol in colNames %}
                                         <td class="col-2 text-center">{{ task[eachCol] }}</td>
                                     {% endfor %}
+                                    <td>
+                                        <div class="d-flex flex-row justify-content-center">
+                                            <a href="{{ url_for('update_task', task_id=task.task_id) }}"><i class="fas fa-pencil-alt mr-5"></i></a>
+                                            <a href="{{ url_for('delete_task', task_id=task.task_id) }}"><i class="far fa-trash-alt"></i></a>
+                                        </div>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

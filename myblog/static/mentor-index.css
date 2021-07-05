@@ -13,6 +13,11 @@
     font-family:"Roboto";
 }
 
+.post-content {
+    height:30px;
+    overflow:hidden;
+}
+
 .author {
     color: #6290f5;
     font-weight: bold;
