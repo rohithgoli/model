@@ -2,75 +2,90 @@
 {% block content %}
     <h1>Update Intern Account</h1>
     <!-- Admin choice for Updating Intern Account -->
-    <div id="adminChoice">
+    <div id="adminChoiceUpdateInternContainer">
         <div class="d-flex flex-row mt-5">
-            <button class="btn btn-primary mr-3" id="addMentorChoiceBtn">Add Mentor</button>
-            <button class="btn btn-warning mr-3" id="deleteMentorChoiceBtn">Delete Mentor</button>
-            <button class="btn btn-danger mr-3" id="deleteInternChoiceBtn">Delete Intern Account</button>
+            <button class="btn btn-outline-primary mr-3" id="assignMentorChoiceBtn">Assign Mentor</button>
+            <button class="btn btn-outline-info mr-3" id="deleteAssignedMentorChoiceBtn">Delete Assigned Mentor</button>
+            <button class="btn btn-outline-secondary mr-3" id="changeInternPasswordBtn">Reset Account Password</button>
+            <button class="btn btn-outline-danger mr-3" id="deleteInternAccountChoiceBtn">Delete Intern Account</button>
         </div>
     </div>
     <div id="operationStatusContainer">
-        <p id="statusMsg"></p>
+
     </div>
-    <div  class="d-none" id="addMentorFormContainer">
-        <form id="addMentorForm">
+    <div  class="d-none" id="assignMentorFormContainer">
+        <form id="assignMentorForm">
             <h3 class="mt-3">Your are Assigning Intern to Mentor</h3>
             <div class="form-field-container mt-3">
                 <label>Select Intern</label>
-                <select class="form-field" id="selectedInternForAddMentor" name="intern" required>
+                <select class="form-field" id="selectedInternForAssignMentor" name="intern" required>
                     <option>Select Intern</option>
                 </select>
             </div>
             <div class="form-field-container mt-3">
                 <label>Select Mentor</label>
-                <select class="form-field" id="selectedMentorForAddMentor" name="mentor" required>
+                <select class="form-field" id="selectedMentorForAssignMentor" name="mentor" required>
                     <option>Select Mentor</option>
                 </select>
             </div>
-            <button id="assignMentor" class="form-btn mt-3">Assign Mentor</button>
-    </form>
-    </div>
-
-    <div  class="d-none" id="formContainer">
-        <form>
-
+            <button type="submit" class="form-btn mt-3">Assign Mentor</button>
         </form>
     </div>
-    <!--
 
-    <div class="d-none" id="addMentorContainer">
-        <form id="addMentorForm">
-            <div class="form-field-container">
+    <div  class="d-none" id="deleteAssignedMentorFormContainer">
+        <form id="deleteAssignedMentorForm">
+            <h3 class="mt-3">Your are Deleting Assigned Mentor to Intern</h3>
+            <div class="form-field-container mt-3">
                 <label>Select Intern</label>
-                <select class="form-field" id="addMentorSelectedIntern" name="intern" required>
-                    <option>Select Intern</option>
-                    {% for intern in interns %}
-                        <option>{{ intern }}</option>
-                    {% endfor %}
-                </select>
-                <p id="addMentorSelectedInternErrorMsg"></p>
+                <input class="form-field" id="selectedInternForDeletingAssignedMentor" name="intern" required>
+                <p id="selectInternForDeletingAssignedMentorErrMsg"></p>
+                <ul id="internSuggestionsContainerForDeletingAssignedMentor"></ul>
+            </div>
+            <div id="mentorSelectionContainerForDeletingAssignedMentor" class="d-none">
+                <div class="form-field-container mt-3">
+                    <label>Select Mentor</label>
+                    <select class="form-field" id="selectedMentorForDeletingAssignedMentor" name="mentor" required>
+                        <option>Select Mentor</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary mt-3">Delete Assigned Mentor</button>
             </div>
         </form>
     </div>
 
-    <div class="d-none">
-        <form id="internAccountUpdateForm">
-        <div class="form-field-container">
-            <label>Select Intern</label>
-            <select class="form-field" id="selectedIntern" name="intern" required>
-                <option>Select Intern</option>
-                {% for intern in interns %}
-                    <option>{{ intern }}</option>
-                {% endfor %}
-            </select>
-            <p id="selectInternErrorMsg"></p>
-        </div>
-
-        <button id="checkBtn">check</button>
-        <button type="submit" class="form-btn">Submit</button>
+    <div class="d-none" id="changeInternPasswordFormContainer">
+        <form id="changeInternPasswordForm">
+            <h3 class="mt-3">You are Changing Intern Account Password</h3>
+            <div class="form-field-container mt-3">
+                <label>Select Intern</label>
+                <input class="form-field" id="selectedInternForChangingAccountPassword" name="intern" required>
+                <p id="selectInternForChangingAccountPasswordErrMsg"></p>
+                <ul id="internSuggestionsContainerForChangingAccountPassword"></ul>
+            </div>
+            <div id="internAccountNewPasswordContainer" class="d-none">
+                <div class="form-field-container mt-3">
+                    <label>Enter New Password</label>
+                    <input class="form-field" type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-secondary mt-3">Change Password</button>
+            </div>
         </form>
     </div>
--->
+
+    <div class="d-none" id="deleteInternAccountFormContainer">
+        <form id="deleteInternAccountForm">
+            <h3 class="mt-3">You are Deleting Intern Account</h3>
+            <div class="form-field-container mt-3">
+                <label>Select Intern</label>
+                <input class="form-field" id="selectedInternForDeletingInternAccount" name="intern" required>
+                <p id="selectInternForDeleteInternAccountErrMsg"></p>
+                <ul id="internSuggestionsContainerForDeleteInternAccount"></ul>
+            </div>
+            <div id="deleteInternAccountSubmitContainer" class="d-none">
+                <button type="submit" class="btn btn-danger mt-3">Delete Intern Account</button>
+            </div>
+        </form>
+    </div>
 {% endblock content %}
 
 {% block dashboard %}
@@ -81,6 +96,8 @@
                         <div class="form-group d-flex flex-column">
                             <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createIntern">Create Intern Account</button>
                             <button class="btn btn-outline-info w-100 m-1" name="admin-choice" type="submit" value="createMentor">Create Mentor Account</button>
+                            <button class="btn btn-outline-primary w-100 m-1" name="admin-choice" type="submit" value="updateIntern">Update Intern Account</button>
+
                             <!--
                             <button class="btn btn-outline-secondary w-100 m-1" name="admin-choice" type="submit" value="tasksByMentor">Display Tasks by Mentor</button>
                             -->

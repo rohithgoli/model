@@ -1,6 +1,6 @@
 
 import flask
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, abort, make_response
 from myblog import app, ndb, bcrypt
 from myblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from myblog.models import Admin, Intern, Mentor, Post, Task
@@ -28,7 +28,6 @@ def home():
             post_dict['author_id'] = each_post.posted_by.id()
             post_list.append(post_dict)
     return render_template('home.html', posts=post_list)
-
 
 # For Mentor - Home page
 @app.route('/home-mentor')
@@ -292,25 +291,171 @@ def get_interns_and_mentors():
         mentors_dict = dict()
         for j in range(len(mentors)):
             mentors_dict[j] = str(mentors[j])
+
         result_dict = {"interns_dict": interns_dict, "mentors_dict": mentors_dict}
     return result_dict
 
 
-#<<<<<<<<<<<<<<< FIX IT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# For Admin
-# Add Mentor to Intern
-@app.route('/add-mentor', methods=['POST'])
+@app.route('/interns', methods=['GET'])
 @login_required
-def add_mentor():
+def get_interns():
+    with client.context():
+        interns = Intern.query().fetch()
+        interns_dict = dict()
+        for i in range(len(interns)):
+            interns_dict[i] = str(interns[i])
+    return interns_dict
+
+
+@app.route('/mentors-for-intern', methods=['POST'])
+@login_required
+def get_mentors_for_intern():
+    admin_data = request.get_json()
+    requested_intern = admin_data.get('selectedIntern')
+    raw_list = requested_intern.split("'")
+    requested_intern_email = [item for item in raw_list if "@gmail.com" in item]
+    requested_intern_email = requested_intern_email[0]
+    with client.context():
+        requested_intern = Intern.query().filter(Intern.email == requested_intern_email).get()
+        if requested_intern:
+            existing_mentors = [str(mentor_key.get()) for mentor_key in requested_intern.mentors]
+            if len(existing_mentors) == 0:
+                current_response = flask.Response(status=406, response=f"Currently {requested_intern} have no assigned mentors", content_type="application/json")
+                return current_response
+            else:
+                mentors_dict = dict()
+                for j in range(len(existing_mentors)):
+                    mentors_dict[j] = str(existing_mentors[j])
+                return mentors_dict
+        else:
+            current_response = flask.Response(status=406, response="Selected Intern does not exist", content_type="application/json")
+            return current_response
+
+
+#<<<<<<<<<<<<<<< FIX IT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>@ndb.transactional
+# includes JS
+# For Admin
+# Assign Mentor to Intern and update intern and mentor accounts
+@app.route('/assign-mentor', methods=['POST'])
+@login_required
+def assign_mentor():
     admin_data = request.get_json()
     requested_intern = admin_data.get('intern')
     requested_mentor = admin_data.get('mentor')
-    print(requested_mentor)
-    print(requested_intern)
     if requested_intern == "Select Intern" or requested_mentor == "Select Mentor":
-       flash('Please Enter all values', 'info')
-       return flask.Response(status=404,);
+        current_response = flask.Response(status=406, response="Please Choose both Intern and Mentor", content_type="application/json")
+        return current_response
+    else:
+        raw_list = requested_mentor.split("'")
+        requested_mentor_email = [item for item in raw_list if "@gmail.com" in item]
+        requested_mentor_email = requested_mentor_email[0]
+        with client.context():
+            requested_mentor = Mentor.query().filter(Mentor.email == requested_mentor_email).get()
+            existing_interns = [str(intern_key.get()) for intern_key in requested_mentor.interns]
+            if requested_intern in existing_interns:
+                current_response = flask.Response(status=406, response=f"{requested_intern} already assigned to {requested_mentor}", content_type="application/json")
+                return current_response
+            else:
+                raw_list = requested_intern.split("'")
+                requested_intern_email = [item for item in raw_list if "@gmail.com" in item]
+                requested_intern_email = requested_intern_email[0]
+                requested_intern = Intern.query().filter(Intern.email == requested_intern_email).get()
+                requested_intern_key = requested_intern.key
+                requested_mentor.interns.append(requested_intern_key)
+                requested_mentor.put()
+                requested_mentor_key = requested_mentor.key
+                requested_intern.mentors.append(requested_mentor_key)
+                requested_intern.put()
     return f'{requested_intern} assigned to {requested_mentor} successfully'
+
+
+# includes JS
+# For Admin
+# Delete existing Mentor to Intern and update intern and mentor accounts
+@app.route('/delete-assigned-mentor', methods=['POST'])
+@login_required
+def delete_assigned_mentor():
+    admin_data = request.get_json()
+    requested_intern = admin_data.get('intern')
+    requested_mentor = admin_data.get('mentor')
+    raw_list = requested_intern.split("'")
+    requested_intern_email = [item for item in raw_list if "@gmail.com" in item]
+    requested_intern_email = requested_intern_email[0]
+    with client.context():
+        requested_intern = Intern.query().filter(Intern.email == requested_intern_email).get()
+        requested_intern_key = requested_intern.key
+        existing_mentors = [str(mentor_key.get()) for mentor_key in requested_intern.mentors]
+        if requested_mentor in existing_mentors:
+            raw_list = requested_mentor.split("'")
+            requested_mentor_email = [item for item in raw_list if "@gmail.com" in item]
+            requested_mentor_email = requested_mentor_email[0]
+            requested_mentor = Mentor.query().filter(Mentor.email == requested_mentor_email).get()
+            requested_mentor_key = requested_mentor.key
+            updated_mentors_for_intern = [mentor_key for mentor_key in requested_intern.mentors if mentor_key != requested_mentor_key]
+            updated_interns_for_mentor = [intern_key for intern_key in requested_mentor.interns if intern_key != requested_intern_key]
+            requested_intern.mentors = updated_mentors_for_intern
+            requested_intern.put()
+            requested_mentor.interns = updated_interns_for_mentor
+            requested_mentor.put()
+            return f"{requested_intern} removed from mentorship of {requested_mentor}"
+        else:
+            current_response = flask.Response(status=406, response=f"{requested_intern} is not being mentored by {requested_mentor}", content_type="application/json")
+            return current_response
+
+
+# includes JS
+# For Admin
+# To change intern password
+@app.route('/change-intern-password', methods=['POST'])
+@login_required
+def change_intern_password():
+    admin_data = request.get_json()
+    requested_intern = admin_data.get('intern')
+    new_password = admin_data.get('password')
+    raw_list = requested_intern.split("'")
+    requested_intern_email = [item for item in raw_list if "@gmail.com" in item]
+    requested_intern_email = requested_intern_email[0]
+    new_hashed_password = bcrypt.generate_password_hash(new_password)
+    with client.context():
+        requested_intern = Intern.query().filter(Intern.email == requested_intern_email).get()
+        requested_intern.password = new_hashed_password
+        requested_intern.put()
+        return f"{requested_intern} account password updated successfully"
+
+
+# includes JS
+# For Admin
+# To delete intern account
+@app.route('/delete-intern-account', methods=['POST'])
+@login_required
+def delete_intern_account():
+    admin_data = request.get_json()
+    requested_intern = admin_data.get('intern')
+    raw_list = requested_intern.split("'")
+    requested_intern_email = [item for item in raw_list if "@gmail.com" in item]
+    requested_intern_email = requested_intern_email[0]
+    with client.context():
+        requested_intern = Intern.query().filter(Intern.email == requested_intern_email).get()
+        if requested_intern:
+            tasks = Task.query().filter(Task.assigned_to == requested_intern.key).fetch()
+            if tasks:
+                for task in tasks:
+                    ndb.Key(Task, int(task.key.id())).delete()
+            posts = Post.query().filter(Post.posted_by == requested_intern.key).fetch()
+            if posts:
+                for post in posts:
+                    ndb.Key(Post, int(post.key.id())).delete()
+            if requested_intern.mentors:
+                for mentor in requested_intern.mentors:
+                    interns_list = mentor.get().interns
+                    updated_interns_list = [intern for intern in interns_list if intern != requested_intern.key]
+                    mentor.get().interns = updated_interns_list
+                    mentor.get().put()
+            ndb.Key(Intern, int(requested_intern.key.id())).delete()
+            return f'{requested_intern} Account deleted successfully'
+        else:
+            current_response = flask.Response(status=406, response=f"{requested_intern} Account does not exist", content_type="application/json")
+            return current_response
 
 
 # For Mentor
